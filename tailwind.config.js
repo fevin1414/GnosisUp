@@ -7,7 +7,7 @@ const config = {
     extend: {},
   },
   darkMode: "class",
-  plugins: [require("tailwind-scrollbar")],
+  plugins: [],
 };
 
 export default config;
