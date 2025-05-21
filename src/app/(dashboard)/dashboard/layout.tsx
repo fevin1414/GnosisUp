@@ -15,12 +15,12 @@ import { ModeToggle } from "@/components/ui/ThemeToggle";
 import ProfileInfoCard from "@/components/Profile/ProfileInfoCard";
 import { Calendar } from "@/components/ui/calendar";
 
-const isUserTeacher = true;
-
 export default function DashboardLayout({
   children,
+  isUserTeacher = true,
 }: {
   children: React.ReactNode;
+  isUserTeacher?: boolean;
 }) {
   const [isTeacherView, setIsTeacherView] = useState(isUserTeacher);
   const [date, setDate] = React.useState<Date | undefined>(new Date());
