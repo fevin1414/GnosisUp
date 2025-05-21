@@ -80,7 +80,9 @@ export default function DashboardLayout({
         </header>
 
         <div className="flex flex-1 overflow-hidden">
-          <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 hide-scrollbar">
+            {children}
+          </main>
 
           <aside className="hidden lg:block w-80 p-4 overflow-y-auto">
             <div className="space-y-4">

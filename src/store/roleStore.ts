@@ -12,11 +12,18 @@ interface RoleStore {
 export const useRoleStore = create<RoleStore>((set, get) => ({
   actualRoles: [],
   viewAs: "student",
-  setRoles: (roles) =>
-    set({
+  setRoles: (roles) => {
+    const { actualRoles } = get();
+    set((state) => ({
       actualRoles: roles,
-      viewAs: roles.includes("teacher") ? "teacher" : "student",
-    }),
+      viewAs:
+        actualRoles.length === 0
+          ? roles.includes("teacher")
+            ? "teacher"
+            : "student"
+          : state.viewAs,
+    }));
+  },
   switchView: () => {
     const { actualRoles, viewAs } = get();
     if (viewAs === "teacher" && actualRoles.includes("student")) {
