@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Sidebar } from "@/components/Dashboard/Sidebar/Sidebar";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,20 +14,25 @@ import { User, LogOut, GraduationCap, UserRound } from "lucide-react";
 import { ModeToggle } from "@/components/ui/ThemeToggle";
 import ProfileInfoCard from "@/components/Profile/ProfileInfoCard";
 import { Calendar } from "@/components/ui/calendar";
+import { useRoleStore } from "@/store/roleStore";
+import type { Role } from "@/store/roleStore";
 
 export default function DashboardLayout({
   children,
-  isUserTeacher = true,
 }: {
   children: React.ReactNode;
-  isUserTeacher?: boolean;
 }) {
-  const [isTeacherView, setIsTeacherView] = useState(isUserTeacher);
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const { viewAs, switchView, setRoles } = useRoleStore();
+  const [date, setDate] = useState<Date | undefined>(new Date());
+
+  useEffect(() => {
+    const rolesFromBackend: Role[] = ["teacher", "student"];
+    setRoles(rolesFromBackend);
+  }, []);
 
   return (
     <div className="relative flex h-screen flex-col md:flex-row overflow-hidden">
-      <Sidebar isTeacherView={isTeacherView} />
+      <Sidebar isTeacherView={viewAs === "teacher"} />
 
       <div className="flex-1 flex flex-col h-full md:ml-64">
         <header className="w-full h-16 border-b bg-background px-4 flex items-center justify-end">
@@ -45,10 +50,10 @@ export default function DashboardLayout({
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end">
                 <DropdownMenuItem
-                  onClick={() => setIsTeacherView(!isTeacherView)}
+                  onClick={switchView}
                   className="cursor-pointer gap-2"
                 >
-                  {isTeacherView ? (
+                  {viewAs === "teacher" ? (
                     <>
                       <UserRound className="h-4 w-4" />
                       <span>Switch to Student View</span>
