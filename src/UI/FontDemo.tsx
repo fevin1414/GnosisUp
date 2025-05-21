@@ -1,10 +1,11 @@
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 export default function FontDemo() {
   return (
     <div>
       <section>
-        <h2 className="text-2xl font-semibold mb-4 font-sans">
+        <h2 className="text-2xl font-semibold mb-4  font-sans">
           Manrope Font (Sans-serif) Testing out Fonts
         </h2>
         <div className="space-y-3">
@@ -14,6 +15,7 @@ export default function FontDemo() {
           <p className="text-5xl font-semibold">Semi-bold 600</p>
           <p className="text-5xl font-bold">Bold 700</p>
         </div>
+        <Button className="cursor-pointer">Click me</Button>
       </section>
 
       <section className="mt-12">
