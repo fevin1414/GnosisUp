@@ -1,4 +1,3 @@
-"use client";
 import {
   Home,
   BookOpenText,
@@ -25,32 +24,32 @@ export const studentLinks: NavLink[] = [
   },
   {
     title: "Courses",
-    href: "/courses",
+    href: "/student/courses",
     icon: <BookOpenText className="h-5 w-5" />,
   },
   {
     title: "Quizzes",
-    href: "/quizzes",
+    href: "/student/quizzes",
     icon: <ClipboardList className="h-5 w-5" />,
   },
   {
     title: "Schedule",
-    href: "/schedule",
+    href: "/student/schedule",
     icon: <Calendar className="h-5 w-5" />,
   },
   {
     title: "Certificates",
-    href: "/certificates",
+    href: "/student/certificates",
     icon: <GraduationCap className="h-5 w-5" />,
   },
   {
     title: "Profile",
-    href: "/profile",
+    href: "/student/profile",
     icon: <User className="h-5 w-5" />,
   },
   {
     title: "Settings",
-    href: "/settings",
+    href: "/student/settings",
     icon: <Settings className="h-5 w-5" />,
   },
 ];
@@ -58,11 +57,11 @@ export const studentLinks: NavLink[] = [
 export const teacherLinks: NavLink[] = [
   {
     title: "Dashboard",
-    href: "/teacher",
+    href: "/dashboard",
     icon: <Home className="h-5 w-5" />,
   },
   {
-    title: "My Courses",
+    title: "Courses",
     href: "/teacher/courses",
     icon: <BookOpenText className="h-5 w-5" />,
   },
@@ -83,7 +82,7 @@ export const teacherLinks: NavLink[] = [
   },
   {
     title: "Profile",
-    href: "/teacher/profile",
+    href: "/teacher/teacher/profile",
     icon: <User className="h-5 w-5" />,
   },
   {
