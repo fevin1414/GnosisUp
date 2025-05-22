@@ -9,17 +9,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
+    // Determine the base URL based on environment
+    const isProduction = process.env.NODE_ENV === "production";
+    const baseUrl = isProduction
+      ? "https://gnosis-up.vercel.app"
+      : "http://localhost:3000";
+
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${process.env.NEXTAUTH_URL}/dashboard` },
+      options: {
+        emailRedirectTo: `${baseUrl}/dashboard`,
+      },
     });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("Supabase auth error:", error);
+      return NextResponse.json(
+        { error: error.message || "Authentication failed" },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ message: "Magic link sent" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Magic link sent successfully" },
+      { status: 200 }
+    );
   } catch (error) {
+    console.error("Server error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
