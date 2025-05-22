@@ -18,9 +18,16 @@ export function Sidebar({ isTeacherView }: { isTeacherView: boolean }) {
       {/* Desktop Sidebar */}
       <div className="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 border-r bg-background dark:bg-gray-900">
         <div className="p-4 h-16 flex items-center justify-between border-b dark:border-gray-700">
-          <h1 className="text-xl font-bold font-sans text-foreground dark:text-white">
-            GnosisUp
-          </h1>
+          <Link href="/" className="flex items-center gap-2 cursor-pointer">
+            <img
+              src="/logo.png"
+              alt="GnosisUp Logo"
+              className="h-10 w-10 object-contain"
+            />
+            <h1 className="text-xl font-bold font-sans text-foreground dark:text-white">
+              GnosisUp
+            </h1>
+          </Link>
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">

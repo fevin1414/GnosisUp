@@ -16,6 +16,7 @@ import ProfileInfoCard from "@/components/Profile/ProfileInfoCard";
 import { Calendar } from "@/components/ui/calendar";
 import { useRoleStore } from "@/store/roleStore";
 import type { Role } from "@/store/roleStore";
+import Link from "next/link";
 
 export default function DashboardLayout({
   children,
@@ -35,7 +36,18 @@ export default function DashboardLayout({
       <Sidebar isTeacherView={viewAs === "teacher"} />
 
       <div className="flex-1 flex flex-col h-full md:ml-64">
-        <header className="w-full h-16 border-b bg-background px-4 flex items-center justify-end">
+        <header className="w-full h-16 border-b bg-background px-4 flex items-center justify-between md:justify-end">
+          <Link href="/" className="flex items-center gap-2 md:hidden">
+            <img
+              src="/logo.png"
+              alt="GnosisUp Logo"
+              className="h-8 w-8 object-contain"
+            />
+            <h1 className="text-lg font-bold font-sans text-foreground dark:text-white">
+              GnosisUp
+            </h1>
+          </Link>
+
           <div className="flex items-center gap-4">
             <ModeToggle />
             <DropdownMenu>
