@@ -57,12 +57,12 @@ export async function POST(request: Request) {
         { status: 403 }
       );
     }
-
+    const baseUrl = "https://gnosis-up.vercel.app/";
     // 3. Send the magic link
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${process.env.NEXTAUTH_URL}/dashboard`,
+        emailRedirectTo: `${baseUrl}/dashboard`,
         shouldCreateUser: false,
       },
     });
