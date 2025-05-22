@@ -14,8 +14,8 @@ import { User, LogOut, GraduationCap, UserRound } from "lucide-react";
 import { ModeToggle } from "@/components/ui/ThemeToggle";
 import ProfileInfoCard from "@/components/Profile/ProfileInfoCard";
 import { Calendar } from "@/components/ui/calendar";
-import { useRoleStore } from "@/store/roleStore";
-import type { Role } from "@/store/roleStore";
+import { useRoleStore } from "../../../../store/roleStore";
+import type { Role } from "../../../../store/roleStore";
 import Link from "next/link";
 
 export default function DashboardLayout({
@@ -99,7 +99,7 @@ export default function DashboardLayout({
           <aside className="hidden lg:block w-80 p-4 overflow-y-auto">
             <div className="space-y-4">
               <ProfileInfoCard />
-              <Card className="w-full rounded-2xl overflow-hidden shadow-xl bg-background border">
+              <Card className="w-full rounded-2xl overflow-hidden bg-background border">
                 <CardContent className="p-4">
                   <Calendar
                     mode="single"

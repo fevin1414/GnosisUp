@@ -1,5 +1,5 @@
 "use client";
-import { useRoleStore } from "@/store/roleStore";
+import { useRoleStore } from "../../../../store/roleStore";
 import StudentDashboardContent from "@/components/Dashboard/Student/StudentDashboard";
 import TeacherDashboardContent from "@/components/Dashboard/Teacher/TeacherDashboard";
 

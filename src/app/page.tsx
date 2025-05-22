@@ -12,8 +12,8 @@ export default function Home() {
         to here now since no authentiation is done clicking the button would
         take us to dashboard
       </p>
-      <Link href="/dashboard">
-        <Button>Go to Dashboard</Button>
+      <Link href="/auth/signUp">
+        <Button>SignUp</Button>
       </Link>
     </main>
   );
