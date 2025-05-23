@@ -5,9 +5,12 @@ export default function SignUpForm() {
   const [first_name, setFirstName] = useState("");
   const [last_name, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"teacher" | "student">("student");
+  const [role, setRole] = useState("STUDENT");
+  const [orgName, setOrgName] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  const isAdmin = role === "ORGANIZATION_ADMIN" || role === "ENTERPRISE_ADMIN";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -17,7 +20,13 @@ export default function SignUpForm() {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ first_name, last_name, email, role }),
+      body: JSON.stringify({
+        first_name,
+        last_name,
+        email,
+        role,
+        orgName: isAdmin ? orgName : null,
+      }),
     });
 
     const data = await res.json();
@@ -67,12 +76,25 @@ export default function SignUpForm() {
 
         <select
           value={role}
-          onChange={(e) => setRole(e.target.value as "teacher" | "student")}
+          onChange={(e) => setRole(e.target.value)}
           className="select select-bordered w-full"
         >
-          <option value="student">Student</option>
-          <option value="teacher">Teacher</option>
+          <option value="STUDENT">Student</option>
+          <option value="TEACHER">Teacher</option>
+          <option value="ORGANIZATION_ADMIN">Organization (1–50 users)</option>
+          <option value="ENTERPRISE_ADMIN">Enterprise (51+ users)</option>
         </select>
+
+        {isAdmin && (
+          <input
+            type="text"
+            required
+            placeholder="Organization/Enterprise Name"
+            className="input input-bordered w-full"
+            value={orgName}
+            onChange={(e) => setOrgName(e.target.value)}
+          />
+        )}
 
         <button
           disabled={loading}

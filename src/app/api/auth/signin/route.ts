@@ -11,11 +11,8 @@ export async function POST(request: Request) {
     const { email } = await request.json();
 
     if (!email) {
-      console.log("❌ Email not provided");
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
-
-    console.log("📧 Email received:", email);
 
     const { data: exists, error: rpcError } = await supabase.rpc(
       "check_user_exists",
@@ -36,29 +33,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const {
-      data: { users },
-      error: authError,
-    } = await supabase.auth.admin.listUsers();
-
-    if (authError) {
-      console.log("❌ Auth fetch error:", authError.message);
-      return NextResponse.json(
-        { error: "Failed to verify account" },
-        { status: 500 }
-      );
-    }
-
-    const user = users.find((u) => u.email === email);
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "Account not verified" },
-        { status: 403 }
-      );
-    }
-    const baseUrl = "https://gnosis-up.vercel.app/";
-    // 3. Send the magic link
+    const baseUrl = "https://gnosis-up.vercel.app";
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -68,7 +43,17 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-      throw error;
+      if (error.message.includes("User not found")) {
+        return NextResponse.json(
+          { error: "Account not verified. Please sign up first." },
+          { status: 403 }
+        );
+      }
+
+      return NextResponse.json(
+        { error: "Failed to send magic link. Try again." },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json(

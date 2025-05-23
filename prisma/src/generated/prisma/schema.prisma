@@ -9,19 +9,38 @@ datasource db {
 }
 
 model User {
-  id              String   @id @default(uuid())
-  first_name      String
-  last_name       String
-  email           String   @unique
-  role            Role     @default(STUDENT)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  isTeacherActive Boolean  @default(false)
+  id             String        @id @default(uuid())
+  first_name     String
+  last_name      String
+  email          String        @unique
+  role           String
+  authUserId     String        @unique
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
 
-  @@map("users")
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  type      OrgType
+  size      Int
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("organizations")
 }
 
 enum Role {
   STUDENT
   TEACHER
+  ORGANIZATION_ADMIN
+  ENTERPRISE_ADMIN
+}
+
+enum OrgType {
+  ORGANIZATION
+  ENTERPRISE
 }
