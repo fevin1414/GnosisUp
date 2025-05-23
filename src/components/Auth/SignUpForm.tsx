@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { signUpSchema } from "../../../utils/validators";
 
 export default function SignUpForm() {
   const [first_name, setFirstName] = useState("");
@@ -17,16 +18,25 @@ export default function SignUpForm() {
     setLoading(true);
     setMessage("");
 
+    const payload = {
+      first_name,
+      last_name,
+      email,
+      role,
+      orgName: isAdmin ? orgName : undefined,
+    };
+
+    const parsed = signUpSchema.safeParse(payload);
+    if (!parsed.success) {
+      setLoading(false);
+      setMessage(parsed.error.issues.map((i) => i.message).join(", "));
+      return;
+    }
+
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        first_name,
-        last_name,
-        email,
-        role,
-        orgName: isAdmin ? orgName : null,
-      }),
+      body: JSON.stringify(parsed.data),
     });
 
     const data = await res.json();
@@ -49,7 +59,6 @@ export default function SignUpForm() {
 
         <input
           type="text"
-          required
           placeholder="First Name"
           className="input input-bordered w-full"
           value={first_name}
@@ -58,7 +67,6 @@ export default function SignUpForm() {
 
         <input
           type="text"
-          required
           placeholder="Last Name"
           className="input input-bordered w-full"
           value={last_name}
@@ -67,7 +75,6 @@ export default function SignUpForm() {
 
         <input
           type="email"
-          required
           placeholder="Email"
           className="input input-bordered w-full"
           value={email}
@@ -88,7 +95,6 @@ export default function SignUpForm() {
         {isAdmin && (
           <input
             type="text"
-            required
             placeholder="Organization/Enterprise Name"
             className="input input-bordered w-full"
             value={orgName}

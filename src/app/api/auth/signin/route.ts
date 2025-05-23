@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { validateRequest, signInSchema } from "../../../../../utils/validators";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -8,35 +9,37 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { email } = await request.json();
-    console.log("📨 Received email:", email);
+    const body = await request.json();
 
-    if (!email) {
-      console.error("❌ No email provided");
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
-    }
+    // ✅ Validate and sanitize email
+    const { email } = validateRequest(signInSchema, body);
 
+    // 🔍 Check if user exists using Supabase RPC
     const { data: exists, error: rpcError } = await supabase.rpc(
       "check_user_exists",
-      { user_email: email }
+      {
+        user_email: email,
+      }
     );
 
     if (rpcError) {
       return NextResponse.json(
-        { error: "RPC failed: " + rpcError.message },
+        { error: `RPC failed: ${rpcError.message}` },
         { status: 500 }
       );
     }
 
     if (!exists) {
-      console.warn("⚠️ No account found for email:", email);
       return NextResponse.json(
         { error: "No account found with this email" },
         { status: 404 }
       );
     }
 
-    const baseUrl = "https://gnosis-up.vercel.app";
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL || "https://gnosis-up.vercel.app";
+
+    // 🚀 Send magic link
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -63,9 +66,9 @@ export async function POST(request: Request) {
       { message: "Magic link sent successfully" },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Authentication failed. Please try again." },
+      { error: error.message || "Authentication failed. Please try again." },
       { status: 500 }
     );
   }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../lib/prisma";
 import { createClient } from "@supabase/supabase-js";
+import { signUpSchema } from "../../../../../utils/validators";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -9,7 +10,20 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   try {
-    const { first_name, last_name, email, role, orgName } = await req.json();
+    const body = await req.json();
+
+    const parseResult = signUpSchema.safeParse(body);
+    if (!parseResult.success) {
+      const errorMessages = parseResult.error.issues.map(
+        (issue) => issue.message
+      );
+      return NextResponse.json(
+        { error: errorMessages.join(", ") },
+        { status: 400 }
+      );
+    }
+
+    const { first_name, last_name, email, role, orgName } = parseResult.data;
 
     let organization = null;
 
@@ -20,7 +34,7 @@ export async function POST(req: NextRequest) {
 
       organization = await prisma.organization.create({
         data: {
-          name: orgName,
+          name: orgName!,
           type: inferredType,
           size: inferredSize,
         },
@@ -34,12 +48,12 @@ export async function POST(req: NextRequest) {
       });
 
     if (authError) {
-      console.error("❌ Supabase Auth error:", authError.message);
       return NextResponse.json(
         { error: "Failed to create Auth user" },
         { status: 500 }
       );
     }
+
     const user = await prisma.user.create({
       data: {
         first_name,
@@ -55,7 +69,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: "User created successfully", user });
   } catch (error) {
-    console.error("Signup error:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

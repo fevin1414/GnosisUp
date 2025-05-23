@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { signInSchema, validateClient } from "../../../utils/validators";
 
 export default function SignInForm() {
   const [email, setEmail] = useState("");
@@ -12,20 +13,23 @@ export default function SignInForm() {
     setLoading(true);
     setMessage("");
 
-    const res = await fetch("/api/auth/signin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
+    try {
+      const validated = validateClient(signInSchema, { email });
 
-    const data = await res.json();
-    setLoading(false);
-    setIsSuccess(res.ok);
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(validated),
+      });
 
-    if (res.ok) {
-      setMessage(data.message);
-    } else {
-      setMessage(data.error || "Something went wrong");
+      const data = await res.json();
+      setIsSuccess(res.ok);
+      setMessage(res.ok ? data.message : data.error || "Something went wrong");
+    } catch (err: any) {
+      setIsSuccess(false);
+      setMessage(err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
