@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
         last_name,
         email,
         role,
-        authUserId: authUser?.user?.id || undefined,
+        authUserId: authUser.user.id,
         organization: organization
           ? { connect: { id: organization.id } }
           : undefined,

@@ -9,8 +9,10 @@ const supabase = createClient(
 export async function POST(request: Request) {
   try {
     const { email } = await request.json();
+    console.log("📨 Received email:", email);
 
     if (!email) {
+      console.error("❌ No email provided");
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
@@ -27,6 +29,7 @@ export async function POST(request: Request) {
     }
 
     if (!exists) {
+      console.warn("⚠️ No account found for email:", email);
       return NextResponse.json(
         { error: "No account found with this email" },
         { status: 404 }
