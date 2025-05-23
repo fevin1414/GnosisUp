@@ -16,14 +16,14 @@ export default function Home() {
         mode the signIn and signup form are not visible
       </p>
       <p>If you dont have an account click here create your account</p>
-      <Link href="/auth/signUp">
+      <Link href="/auth/signup">
         <Button>SignUp</Button>
       </Link>
       <p>
         If you have an account click on Login enter your email check your email
         for a signIn link click on it
       </p>
-      <Link href="/auth/signIn">
+      <Link href="/auth/signin">
         <Button>Login</Button>
       </Link>
     </main>

@@ -1,6 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { signInSchema, validateClient } from "../../../utils/validators";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function SignInForm() {
   const [email, setEmail] = useState("");
@@ -34,26 +36,23 @@ export default function SignInForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center">Sign In</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <input
-              type="email"
-              required
-              placeholder="Email"
-              className="input input-bordered w-full"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <button disabled={loading} className="btn btn-primary w-full">
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">
+      <div className="w-full max-w-md p-8 space-y-6 bg-card shadow-lg rounded-2xl border border-border">
+        <h2 className="text-3xl font-bold text-center">Sign In</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            type="email"
+            required
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Button className="w-full" disabled={loading}>
             {loading ? "Sending magic link..." : "Sign In"}
-          </button>
+          </Button>
           {message && (
             <p
-              className={`mt-2 text-center ${
+              className={`text-center text-sm ${
                 isSuccess ? "text-green-500" : "text-red-500"
               }`}
             >

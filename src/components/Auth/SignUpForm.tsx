@@ -1,8 +1,20 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { signUpSchema } from "../../../utils/validators";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 export default function SignUpForm() {
+  const router = useRouter();
   const [first_name, setFirstName] = useState("");
   const [last_name, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -43,74 +55,75 @@ export default function SignUpForm() {
     setLoading(false);
 
     if (res.ok) {
-      setMessage(data.message);
+      router.push("/auth/signin");
     } else {
       setMessage(data.error || "Something went wrong");
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-background text-foreground">
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 w-full max-w-md p-6 bg-white rounded-xl shadow-md"
+        className="space-y-4 w-full max-w-md p-6 bg-card rounded-2xl shadow-lg border border-border"
       >
-        <h2 className="text-2xl font-semibold text-center">Sign Up</h2>
+        <h2 className="text-3xl font-bold text-center">Sign Up</h2>
 
-        <input
+        <Input
           type="text"
           placeholder="First Name"
-          className="input input-bordered w-full"
           value={first_name}
           onChange={(e) => setFirstName(e.target.value)}
         />
 
-        <input
+        <Input
           type="text"
           placeholder="Last Name"
-          className="input input-bordered w-full"
           value={last_name}
           onChange={(e) => setLastName(e.target.value)}
         />
 
-        <input
+        <Input
           type="email"
           placeholder="Email"
-          className="input input-bordered w-full"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          className="select select-bordered w-full"
-        >
-          <option value="STUDENT">Student</option>
-          <option value="TEACHER">Teacher</option>
-          <option value="ORGANIZATION_ADMIN">Organization (1–50 users)</option>
-          <option value="ENTERPRISE_ADMIN">Enterprise (51+ users)</option>
-        </select>
+        <div>
+          <Label className="mb-1 block">Select Role</Label>
+          <Select value={role} onValueChange={setRole}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="STUDENT">Student</SelectItem>
+              <SelectItem value="TEACHER">Teacher</SelectItem>
+              <SelectItem value="ORGANIZATION_ADMIN">
+                Organization (1–50 users)
+              </SelectItem>
+              <SelectItem value="ENTERPRISE_ADMIN">
+                Enterprise (51+ users)
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         {isAdmin && (
-          <input
+          <Input
             type="text"
             placeholder="Organization/Enterprise Name"
-            className="input input-bordered w-full"
             value={orgName}
             onChange={(e) => setOrgName(e.target.value)}
           />
         )}
 
-        <button
-          disabled={loading}
-          className="btn btn-primary w-full disabled:opacity-50"
-        >
+        <Button type="submit" className="w-full" disabled={loading}>
           {loading ? "Signing up..." : "Sign Up"}
-        </button>
+        </Button>
 
         {message && (
-          <p className="mt-2 text-center text-sm text-gray-700">{message}</p>
+          <p className="mt-2 text-center text-sm text-red-500">{message}</p>
         )}
       </form>
     </div>
