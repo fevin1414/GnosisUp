@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Manrope, Inconsolata } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/Providers/theme-provider";
+import Navbar from "@/components/Navbar/Navbar";
+import { usePathname } from "next/navigation";
+import ClientLayout from "./ClientLayout";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -32,7 +35,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <ClientLayout>{children}</ClientLayout>
         </ThemeProvider>
       </body>
     </html>
