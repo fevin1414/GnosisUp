@@ -1,30 +1,41 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { validateRequest, signInSchema } from "../../../../../utils/validators";
+import { Ratelimit } from "@upstash/ratelimit";
+import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, "1 m"),
+  prefix: "signin",
+});
+
 export async function POST(request: Request) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+
+  const { success } = await ratelimit.limit(ip);
+  if (!success) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
-
-    // ✅ Validate and sanitize email
     const { email } = validateRequest(signInSchema, body);
 
-    // 🔍 Check if user exists using Supabase RPC
     const { data: exists, error: rpcError } = await supabase.rpc(
       "check_user_exists",
-      {
-        user_email: email,
-      }
+      { user_email: email }
     );
 
     if (rpcError) {
       return NextResponse.json(
-        { error: `RPC failed: ${rpcError.message}` },
+        { error: "Internal server error" },
         { status: 500 }
       );
     }
@@ -39,7 +50,6 @@ export async function POST(request: Request) {
     const baseUrl =
       process.env.NEXT_PUBLIC_BASE_URL || "https://gnosis-up.vercel.app";
 
-    // 🚀 Send magic link
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -49,15 +59,8 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-      if (error.message.includes("User not found")) {
-        return NextResponse.json(
-          { error: "Account not verified. Please sign up first." },
-          { status: 403 }
-        );
-      }
-
       return NextResponse.json(
-        { error: "Failed to send magic link. Try again." },
+        { error: "Failed to send magic link" },
         { status: 500 }
       );
     }
@@ -66,10 +69,7 @@ export async function POST(request: Request) {
       { message: "Magic link sent successfully" },
       { status: 200 }
     );
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Authentication failed. Please try again." },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 }

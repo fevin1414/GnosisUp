@@ -22,6 +22,8 @@
     "@radix-ui/react-switch": "^1.2.5",
     "@supabase/supabase-js": "^2.49.8",
     "@tailwindcss/postcss": "^4.1.7",
+    "@upstash/ratelimit": "^2.0.5",
+    "@vercel/kv": "^3.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
