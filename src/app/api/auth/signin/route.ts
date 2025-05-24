@@ -1,26 +1,35 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { validateRequest, signInSchema } from "../../../../../utils/validators";
-import { Ratelimit } from "@upstash/ratelimit";
-import { kv } from "@vercel/kv";
-import { Redis } from "@upstash/redis";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(5, "1 m"),
-  prefix: "signin",
-});
+const ipRequestCounts = new Map<string, { count: number; timestamp: number }>();
+
+function rateLimit(ip: string, limit = 5, windowMs = 60 * 1000): boolean {
+  const now = Date.now();
+  const entry = ipRequestCounts.get(ip);
+
+  if (!entry || now - entry.timestamp > windowMs) {
+    ipRequestCounts.set(ip, { count: 1, timestamp: now });
+    return true;
+  }
+
+  if (entry.count >= limit) {
+    return false;
+  }
+
+  entry.count += 1;
+  return true;
+}
 
 export async function POST(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
 
-  const { success } = await ratelimit.limit(ip);
-  if (!success) {
+  if (!rateLimit(ip)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 

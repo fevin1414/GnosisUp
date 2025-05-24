@@ -2,25 +2,35 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../lib/prisma";
 import { createClient } from "@supabase/supabase-js";
 import { signUpSchema } from "../../../../../utils/validators";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(3, "1 m"),
-  prefix: "signup",
-});
+const ipRequestCounts = new Map<string, { count: number; timestamp: number }>();
+
+function rateLimit(ip: string, limit = 3, windowMs = 60 * 1000): boolean {
+  const now = Date.now();
+  const entry = ipRequestCounts.get(ip);
+
+  if (!entry || now - entry.timestamp > windowMs) {
+    ipRequestCounts.set(ip, { count: 1, timestamp: now });
+    return true;
+  }
+
+  if (entry.count >= limit) {
+    return false;
+  }
+
+  entry.count += 1;
+  return true;
+}
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") || "unknown";
 
-  const { success } = await ratelimit.limit(ip);
-  if (!success) {
+  if (!rateLimit(ip)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
@@ -83,7 +93,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ message: "User created successfully", user });
-  } catch {
+  } catch (error) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
